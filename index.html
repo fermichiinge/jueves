@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito de Compras | Tienda Tech</title>
+  <!-- Tipografias con mas personalidad -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Fondo animado por capas -->
+  <div class="mesh-bg"></div>
+  <div class="grain-layer"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- Carrito flotante para animacion al pagar -->
+  <div id="cartFly" class="cart-fly hidden" aria-hidden="true">🛒</div>
+
+  <div class="app">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Simulacion interactiva con inventario en tiempo real</p>
+        <h1>🛒 Carrito de Compras - Productos de Informatica</h1>
+        <p class="company-badge">Factura emitida por: <strong>Pinturas Tech Color, S.A.</strong></p>
+        <p id="clockText" class="clock">Cargando fecha y hora...</p>
+      </div>
+
+      <div class="header-actions">
+        <!-- Modo visual -->
+        <button id="themeToggle" class="btn ghost" type="button">🌞 Modo Claro</button>
+
+        <!-- Moneda principal de visualizacion -->
+        <label class="inline-control">
+          <span>💱 Moneda</span>
+          <select id="currencySelect">
+            <option value="GTQ">Quetzales (GTQ)</option>
+            <option value="USD">Dolares (USD)</option>
+          </select>
+        </label>
+
+        <!-- Tipo de cambio editable -->
+        <label class="inline-control">
+          <span>1 USD = GTQ</span>
+          <input id="exchangeRateInput" type="number" min="0.01" step="0.01" value="7.8">
+        </label>
+
+        <!-- Resumen visual tipo caja registradora -->
+        <div class="register-box">
+          <p>🔔 Caja registradora</p>
+          <strong id="registerTotal">Q0.00</strong>
+          <label>
+            Volumen
+            <input id="volumeRange" type="range" min="0" max="1" step="0.05" value="0.4">
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="card product-panel">
+        <div class="panel-title">
+          <h2>🖥️ Catalogo de productos</h2>
+          <div class="stock-board">
+            <span>Inventario disponible: <strong id="stockAvailable">0</strong></span>
+            <span>En carrito: <strong id="stockCart">0</strong></span>
+          </div>
+        </div>
+
+        <!-- Buscador para filtrar productos -->
+        <div class="search-wrap">
+          <label for="productSearch">🔎 Buscar producto</label>
+          <input id="productSearch" type="search" placeholder="Ej: laptop, iphone, teclado...">
+        </div>
+
+        <div id="productGrid" class="product-grid"></div>
+      </section>
+
+      <aside class="side-column">
+        <section class="card cart-card">
+          <h2>🧾 Tu carrito</h2>
+          <div id="cartItems" class="cart-items"></div>
+
+          <div class="totals">
+            <p>Subtotal: <strong id="subtotalText">Q0.00</strong></p>
+            <p>IVA (12%): <strong id="ivaText">Q0.00</strong></p>
+            <p class="total-line">Total a pagar: <strong id="totalText">Q0.00</strong></p>
+          </div>
+
+          <div class="cart-actions">
+            <button id="openPayBtn" class="btn secondary full" type="button">💳 Proceder a pagar</button>
+            <button id="clearCartBtn" class="btn danger" type="button">🗑️ Vaciar carrito</button>
+            <button id="pdfBtn" class="btn primary" type="button">📄 Generar factura PDF</button>
+          </div>
+        </section>
+
+        <section class="card payment-card">
+          <!-- Este bloque se abre automaticamente al dar clic en Proceder a pagar -->
+          <details id="paymentDetails">
+            <summary>💳 Pago y validacion</summary>
+            <form id="paymentForm" novalidate>
+              <label>
+                Nombre completo
+                <input id="buyerName" type="text" placeholder="Ej: Ana Lopez" required>
+              </label>
+
+              <label>
+                Correo
+                <input id="buyerEmail" type="email" placeholder="correo@ejemplo.com" required>
+              </label>
+
+              <label>
+                Usuario registrado (selecciona)
+                <select id="buyerAccount" required>
+                  <option value="">Selecciona un usuario</option>
+                  <option value="cliente1">cliente1</option>
+                  <option value="cliente2">cliente2</option>
+                  <option value="empresaGT">empresaGT</option>
+                </select>
+              </label>
+
+              <p id="accountInfo" class="account-info">Selecciona un usuario para ver usuario y clave.</p>
+
+              <label>
+                Metodo de pago
+                <select id="paymentMethod">
+                  <option value="card">Tarjeta</option>
+                  <option value="transfer">Transferencia</option>
+                  <option value="cash">Efectivo contra entrega</option>
+                </select>
+              </label>
+
+              <div id="cardFields" class="card-fields">
+                <label>
+                  Numero de tarjeta
+                  <input id="cardNumber" type="text" inputmode="numeric" placeholder="1111 2222 3333 4444">
+                </label>
+                <label>
+                  Vencimiento
+                  <input id="cardExpiry" type="text" placeholder="MM/AA">
+                </label>
+                <label>
+                  CVV
+                  <input id="cardCvv" type="text" inputmode="numeric" placeholder="123">
+                </label>
+              </div>
+
+              <button class="btn primary full" type="submit">✅ Validar y pagar</button>
+            </form>
+            <p id="paymentMessage" class="payment-message">Completa tus datos para validar el pago.</p>
+          </details>
+        </section>
+
+        <section class="card receipt-card">
+          <h3>📌 Ultima factura</h3>
+          <div id="receiptInfo">Aun no hay pagos registrados.</div>
+        </section>
+
+        <section class="card users-card">
+          <h3>👥 Usuarios demo</h3>
+          <p><strong>cliente1</strong> / 1234</p>
+          <p><strong>cliente2</strong> / abcd</p>
+          <p><strong>empresaGT</strong> / compra2026</p>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Modal para vista previa del producto -->
+  <div id="previewModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+    <div class="modal-content">
+      <button id="closePreviewBtn" class="close-btn" type="button" aria-label="Cerrar vista previa">✖</button>
+      <img id="previewImage" src="" alt="Vista previa del producto">
+      <h3 id="previewTitle">Producto</h3>
+      <p id="previewPrice"></p>
+      <p id="previewStock"></p>
+    </div>
+  </div>
+
+  <!-- Libreria jsPDF para exportar factura -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="script.js"></script>
+</body>
+</html>
