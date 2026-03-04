@@ -31,7 +31,7 @@ const products = [
     keywords: ["laptop", "gamer", "rtx"],
     price: 8450,
     stock: 5,
-    image: "https://source.unsplash.com/900x600/?gaming,laptop,computer"
+    image: "assets/products/laptop-gamer.svg"
   },
   {
     id: "iphone-pro",
@@ -40,7 +40,7 @@ const products = [
     keywords: ["iphone", "smartphone", "apple"],
     price: 9200,
     stock: 4,
-    image: "https://source.unsplash.com/900x600/?iphone,smartphone,apple"
+    image: "assets/products/iphone-pro.svg"
   },
   {
     id: "teclado-rgb",
@@ -49,7 +49,7 @@ const products = [
     keywords: ["teclado", "keyboard", "rgb"],
     price: 680,
     stock: 10,
-    image: "https://source.unsplash.com/900x600/?mechanical,keyboard,rgb"
+    image: "assets/products/teclado-rgb.svg"
   },
   {
     id: "mouse-pro",
@@ -58,7 +58,7 @@ const products = [
     keywords: ["mouse", "wireless", "gaming"],
     price: 390,
     stock: 12,
-    image: "https://source.unsplash.com/900x600/?computer,mouse,wireless"
+    image: "assets/products/mouse-pro.svg"
   },
   {
     id: "monitor-4k",
@@ -67,7 +67,7 @@ const products = [
     keywords: ["monitor", "4k", "pantalla"],
     price: 2750,
     stock: 6,
-    image: "https://source.unsplash.com/900x600/?monitor,display,computer"
+    image: "assets/products/monitor-4k.svg"
   },
   {
     id: "audifonos",
@@ -76,7 +76,7 @@ const products = [
     keywords: ["audifonos", "headphones", "gamer"],
     price: 520,
     stock: 8,
-    image: "https://source.unsplash.com/900x600/?gaming,headphones,headset"
+    image: "assets/products/audifonos.svg"
   },
   {
     id: "tablet",
@@ -85,7 +85,7 @@ const products = [
     keywords: ["tablet", "screen", "touch"],
     price: 3340,
     stock: 7,
-    image: "https://source.unsplash.com/900x600/?tablet,device,technology"
+    image: "assets/products/tablet.svg"
   },
   {
     id: "camara-web",
@@ -94,7 +94,7 @@ const products = [
     keywords: ["camara", "webcam", "stream"],
     price: 310,
     stock: 15,
-    image: "https://source.unsplash.com/900x600/?webcam,camera,computer"
+    image: "assets/products/camara-web.svg"
   }
 ];
 
@@ -148,6 +148,14 @@ const dom = {
 };
 
 let audioContext = null;
+
+function ensureAudioContext() {
+  if (!audioContext) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioCtx();
+  }
+  return audioContext;
+}
 
 // ======================================================
 // Utilidades de formato de moneda
@@ -247,6 +255,13 @@ function renderProducts() {
         </div>
       </div>
     `;
+
+    // Si una imagen falla, usar una imagen de respaldo.
+    const imageEl = card.querySelector("img");
+    imageEl.addEventListener("error", () => {
+      imageEl.src = "assets/products/generic-tech.svg";
+    });
+
     dom.productGrid.appendChild(card);
   });
 }
@@ -337,16 +352,12 @@ function playRegisterBeep() {
   }
 
   try {
-    if (!audioContext) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      audioContext = new AudioCtx();
-    }
+    const ctx = ensureAudioContext();
+    const now = ctx.currentTime;
 
-    const now = audioContext.currentTime;
-
-    // Tono 1: campaneo agudo.
-    const osc1 = audioContext.createOscillator();
-    const gain1 = audioContext.createGain();
+    // Tono 1: campaneo agudo de la caja.
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
     osc1.type = "square";
     osc1.frequency.setValueAtTime(1280, now);
     osc1.frequency.exponentialRampToValueAtTime(820, now + 0.07);
@@ -355,8 +366,8 @@ function playRegisterBeep() {
     gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
 
     // Tono 2: refuerzo grave para que suene mas "caja".
-    const osc2 = audioContext.createOscillator();
-    const gain2 = audioContext.createGain();
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
     osc2.type = "triangle";
     osc2.frequency.setValueAtTime(460, now + 0.02);
     osc2.frequency.exponentialRampToValueAtTime(280, now + 0.13);
@@ -364,8 +375,8 @@ function playRegisterBeep() {
     gain2.gain.exponentialRampToValueAtTime(Math.max(0.001, state.volume * 0.1), now + 0.04);
     gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
 
-    osc1.connect(gain1).connect(audioContext.destination);
-    osc2.connect(gain2).connect(audioContext.destination);
+    osc1.connect(gain1).connect(ctx.destination);
+    osc2.connect(gain2).connect(ctx.destination);
 
     osc1.start(now);
     osc1.stop(now + 0.1);
@@ -373,6 +384,36 @@ function playRegisterBeep() {
     osc2.stop(now + 0.16);
   } catch (error) {
     // Si un navegador bloquea audio sin interaccion, la app sigue funcionando.
+  }
+}
+
+// Sonido adicional corto para confirmar "producto agregado".
+function playAddSparkSound() {
+  if (state.volume <= 0) {
+    return;
+  }
+
+  try {
+    const ctx = ensureAudioContext();
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(780, now);
+    osc.frequency.exponentialRampToValueAtTime(1120, now + 0.04);
+    osc.frequency.exponentialRampToValueAtTime(930, now + 0.08);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.001, state.volume * 0.09), now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  } catch (error) {
+    // Ignora errores de audio para no afectar el flujo de compra.
   }
 }
 
@@ -389,6 +430,7 @@ function addToCart(productId) {
   product.stock -= 1;
   state.cart[productId] = (state.cart[productId] || 0) + 1;
   playRegisterBeep();
+  setTimeout(playAddSparkSound, 55);
   renderAll();
 }
 
@@ -448,6 +490,10 @@ function openPreview(productId) {
 
   dom.previewImage.src = product.image;
   dom.previewImage.alt = product.name;
+  dom.previewImage.onerror = () => {
+    dom.previewImage.src = "assets/products/generic-tech.svg";
+    dom.previewImage.onerror = null;
+  };
   dom.previewTitle.textContent = `${product.emoji} ${product.name}`;
   dom.previewPrice.textContent = `Precio: ${formatMoney(product.price)} (${formatSecondaryMoney(product.price)})`;
   dom.previewStock.textContent = `Stock actual: ${product.stock}`;

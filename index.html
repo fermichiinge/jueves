@@ -49,11 +49,28 @@
           <input id="exchangeRateInput" type="number" min="0.01" step="0.01" value="7.8">
         </label>
 
-        <!-- Resumen visual tipo caja registradora -->
+        <!-- Caja registradora con pantalla y botones decorativos -->
         <div class="register-box">
-          <p>🔔 Caja registradora</p>
-          <strong id="registerTotal">Q0.00</strong>
-          <label>
+          <div class="register-top">
+            <p>🔔 Caja registradora</p>
+            <span class="register-led" aria-hidden="true"></span>
+          </div>
+
+          <div class="register-screen">
+            <small>Total</small>
+            <strong id="registerTotal">Q0.00</strong>
+          </div>
+
+          <div class="register-keypad" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <label class="register-volume">
             Volumen
             <input id="volumeRange" type="range" min="0" max="1" step="0.05" value="0.4">
           </label>

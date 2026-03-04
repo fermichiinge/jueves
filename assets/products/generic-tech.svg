@@ -1,0 +1,21 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="Producto de Informatica">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a8d2ff"/>
+      <stop offset="100%" stop-color="#99e3ca"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <rect x="60" y="60" width="1080" height="680" rx="36" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.45)"/>
+  <ellipse cx="600" cy="270" rx="300" ry="180" fill="url(#glow)"/>
+  <rect x="370" y="300" width="460" height="220" rx="28" fill="rgba(15,38,62,0.22)" stroke="rgba(255,255,255,0.5)"/>
+  <rect x="430" y="360" width="340" height="10" rx="5" fill="rgba(255,255,255,0.45)"/>
+  <rect x="430" y="384" width="240" height="10" rx="5" fill="rgba(255,255,255,0.3)"/>
+  <text x="600" y="295" font-size="130" text-anchor="middle" dominant-baseline="middle">🧩</text>
+  <text x="600" y="620" fill="#14314d" font-size="54" font-weight="700" text-anchor="middle" font-family="Verdana,Segoe UI,Arial,sans-serif">Producto de Informatica</text>
+  <text x="600" y="666" fill="#204868" font-size="30" font-weight="600" text-anchor="middle" font-family="Verdana,Segoe UI,Arial,sans-serif">Imagen de respaldo</text>
+</svg>
