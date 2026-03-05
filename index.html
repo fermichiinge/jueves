@@ -17,6 +17,16 @@
   <div class="bg-orb orb-1"></div>
   <div class="bg-orb orb-2"></div>
   <div class="bg-orb orb-3"></div>
+  <div class="ocean-creatures" aria-hidden="true">
+    <span class="creature whale whale-a">🐋</span>
+    <span class="creature whale whale-b">🐳</span>
+    <span class="creature jelly jelly-a">🪼</span>
+    <span class="creature jelly jelly-b">🪼</span>
+    <span class="bubble bubble-a"></span>
+    <span class="bubble bubble-b"></span>
+    <span class="bubble bubble-c"></span>
+    <span class="bubble bubble-d"></span>
+  </div>
 
   <!-- Carrito flotante para animacion al pagar -->
   <div id="cartFly" class="cart-fly hidden" aria-hidden="true">🛒</div>
@@ -104,6 +114,7 @@
 
           <div class="totals">
             <p>Subtotal: <strong id="subtotalText">Q0.00</strong></p>
+            <p>Extras: <strong id="extrasText">Q0.00</strong></p>
             <p>IVA (12%): <strong id="ivaText">Q0.00</strong></p>
             <p class="total-line">Total a pagar: <strong id="totalText">Q0.00</strong></p>
           </div>
@@ -122,8 +133,9 @@
             <form id="paymentForm" novalidate>
               <label>
                 Nombre completo
-                <input id="buyerName" type="text" placeholder="Ej: Ana Lopez" required>
+                <input id="buyerName" type="text" placeholder="Ej: Ana Lopez" minlength="3" pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+" required>
               </label>
+              <p class="tiny-help">Solo letras y espacios. No se permiten digitos.</p>
 
               <label>
                 Correo
@@ -151,20 +163,38 @@
                 </select>
               </label>
 
-              <div id="cardFields" class="card-fields">
-                <label>
-                  Numero de tarjeta
-                  <input id="cardNumber" type="text" inputmode="numeric" placeholder="1111 2222 3333 4444">
-                </label>
-                <label>
-                  Vencimiento
-                  <input id="cardExpiry" type="text" placeholder="MM/AA">
-                </label>
-                <label>
-                  CVV
-                  <input id="cardCvv" type="text" inputmode="numeric" placeholder="123">
-                </label>
-              </div>
+              <details class="extra-options">
+                <summary>✨ Opciones extra (desplegable)</summary>
+                <div class="extra-options-grid">
+                  <label>
+                    Tipo de entrega
+                    <select id="deliveryOption">
+                      <option value="standard">Normal (sin recargo)</option>
+                      <option value="express">Express (+Q45)</option>
+                    </select>
+                  </label>
+
+                  <label class="check-option">
+                    <input id="giftWrapOption" type="checkbox">
+                    Empaque de regalo (+Q20)
+                  </label>
+
+                  <label class="check-option">
+                    <input id="prioritySupportOption" type="checkbox">
+                    Soporte prioritario (+Q35)
+                  </label>
+
+                  <label class="check-option">
+                    <input id="invoiceCopyOption" type="checkbox">
+                    Copia extra de factura (sin costo)
+                  </label>
+
+                  <label>
+                    Nota del pedido
+                    <textarea id="orderNote" rows="2" placeholder="Ej: Entregar despues de las 3pm"></textarea>
+                  </label>
+                </div>
+              </details>
 
               <button class="btn primary full" type="submit">✅ Validar y pagar</button>
             </form>

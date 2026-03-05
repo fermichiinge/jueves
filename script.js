@@ -117,6 +117,7 @@ const dom = {
   productSearch: document.getElementById("productSearch"),
   cartItems: document.getElementById("cartItems"),
   subtotalText: document.getElementById("subtotalText"),
+  extrasText: document.getElementById("extrasText"),
   ivaText: document.getElementById("ivaText"),
   totalText: document.getElementById("totalText"),
   clearCartBtn: document.getElementById("clearCartBtn"),
@@ -132,10 +133,15 @@ const dom = {
   registerTotal: document.getElementById("registerTotal"),
   volumeRange: document.getElementById("volumeRange"),
   paymentForm: document.getElementById("paymentForm"),
+  buyerName: document.getElementById("buyerName"),
   buyerAccount: document.getElementById("buyerAccount"),
   accountInfo: document.getElementById("accountInfo"),
   paymentMethod: document.getElementById("paymentMethod"),
-  cardFields: document.getElementById("cardFields"),
+  deliveryOption: document.getElementById("deliveryOption"),
+  giftWrapOption: document.getElementById("giftWrapOption"),
+  prioritySupportOption: document.getElementById("prioritySupportOption"),
+  invoiceCopyOption: document.getElementById("invoiceCopyOption"),
+  orderNote: document.getElementById("orderNote"),
   paymentMessage: document.getElementById("paymentMessage"),
   receiptInfo: document.getElementById("receiptInfo"),
   previewModal: document.getElementById("previewModal"),
@@ -207,6 +213,32 @@ function getSubtotalGtq() {
     const product = getProductById(productId);
     return product ? subtotal + product.price * qty : subtotal;
   }, 0);
+}
+
+// Lee y calcula recargos de las opciones extra desplegables.
+function getExtraOptionsSnapshot() {
+  const delivery = dom.deliveryOption ? dom.deliveryOption.value : "standard";
+  const giftWrap = Boolean(dom.giftWrapOption && dom.giftWrapOption.checked);
+  const prioritySupport = Boolean(dom.prioritySupportOption && dom.prioritySupportOption.checked);
+  const invoiceCopy = Boolean(dom.invoiceCopyOption && dom.invoiceCopyOption.checked);
+  const note = dom.orderNote ? dom.orderNote.value.trim() : "";
+
+  const deliveryFee = delivery === "express" ? 45 : 0;
+  const giftWrapFee = giftWrap ? 20 : 0;
+  const priorityFee = prioritySupport ? 35 : 0;
+  const extrasGtq = deliveryFee + giftWrapFee + priorityFee;
+
+  return {
+    delivery,
+    giftWrap,
+    prioritySupport,
+    invoiceCopy,
+    note,
+    deliveryFee,
+    giftWrapFee,
+    priorityFee,
+    extrasGtq
+  };
 }
 
 function getFilteredProducts() {
@@ -303,10 +335,13 @@ function renderCart() {
   }
 
   const subtotal = getSubtotalGtq();
-  const iva = subtotal * 0.12;
-  const total = subtotal + iva;
+  const extraOptions = getExtraOptionsSnapshot();
+  const taxableBase = subtotal + extraOptions.extrasGtq;
+  const iva = taxableBase * 0.12;
+  const total = taxableBase + iva;
 
   dom.subtotalText.textContent = formatMoney(subtotal);
+  dom.extrasText.textContent = formatMoney(extraOptions.extrasGtq);
   dom.ivaText.textContent = formatMoney(iva);
   dom.totalText.textContent = formatMoney(total);
   dom.registerTotal.textContent = formatMoney(total);
@@ -331,6 +366,7 @@ function renderReceiptInfo() {
     <p><strong>Cliente:</strong> ${receipt.buyerName}</p>
     <p><strong>Usuario:</strong> ${receipt.buyerUser}</p>
     <p><strong>Metodo:</strong> ${receipt.methodLabel}</p>
+    <p><strong>Extras:</strong> ${formatMoneyByCurrency(receipt.extrasGtq, receipt.currency, receipt.exchangeRate)}</p>
     <p><strong>Fecha:</strong> ${receipt.dateText}</p>
     <p><strong>Total:</strong> ${formatMoneyByCurrency(receipt.totalGtq, receipt.currency, receipt.exchangeRate)}</p>
   `;
@@ -536,17 +572,12 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function isValidCardNumber(value) {
-  const digits = value.replace(/\s+/g, "");
-  return /^\d{13,19}$/.test(digits);
+function sanitizeName(value) {
+  return value.replace(/\d+/g, "").replace(/\s{2,}/g, " ").trimStart();
 }
 
-function isValidExpiry(value) {
-  return /^(0[1-9]|1[0-2])\/\d{2}$/.test(value);
-}
-
-function isValidCvv(value) {
-  return /^\d{3,4}$/.test(value);
+function isValidName(name) {
+  return /^[A-Za-zÁÉÍÓÚáéíóúÑñ.'\-\s]{3,}$/.test(name) && !/\d/.test(name);
 }
 
 // ======================================================
@@ -573,9 +604,11 @@ function buildReceiptSnapshot(customerData) {
     };
   });
 
+  const extraOptions = getExtraOptionsSnapshot();
   const subtotalGtq = getSubtotalGtq();
-  const ivaGtq = subtotalGtq * 0.12;
-  const totalGtq = subtotalGtq + ivaGtq;
+  const taxableBaseGtq = subtotalGtq + extraOptions.extrasGtq;
+  const ivaGtq = taxableBaseGtq * 0.12;
+  const totalGtq = taxableBaseGtq + ivaGtq;
   const methodMap = {
     card: "Tarjeta",
     transfer: "Transferencia",
@@ -593,6 +626,8 @@ function buildReceiptSnapshot(customerData) {
     currency: state.currency,
     exchangeRate: state.exchangeRate,
     items,
+    extras: extraOptions,
+    extrasGtq: extraOptions.extrasGtq,
     subtotalGtq,
     ivaGtq,
     totalGtq
@@ -611,14 +646,6 @@ function updateAccountInfo() {
   }
 
   dom.accountInfo.textContent = `Usuario: ${selected.username} | Clave: ${selected.password} | Tipo: ${selected.label}`;
-}
-
-function toggleCardFields() {
-  if (dom.paymentMethod.value === "card") {
-    dom.cardFields.classList.remove("hidden");
-  } else {
-    dom.cardFields.classList.add("hidden");
-  }
 }
 
 function animateCartFly() {
@@ -656,13 +683,14 @@ function handlePaymentSubmit(event) {
     return;
   }
 
-  const buyerName = document.getElementById("buyerName").value.trim();
+  const buyerName = sanitizeName(document.getElementById("buyerName").value.trim());
+  dom.buyerName.value = buyerName;
   const buyerEmail = document.getElementById("buyerEmail").value.trim();
   const selectedAccount = getAccountByUsername(dom.buyerAccount.value);
   const method = dom.paymentMethod.value;
 
-  if (buyerName.length < 3) {
-    setPaymentMessage("Ingresa un nombre valido (minimo 3 caracteres).", "error");
+  if (!isValidName(buyerName)) {
+    setPaymentMessage("Ingresa un nombre valido sin digitos (solo letras y espacios).", "error");
     return;
   }
 
@@ -674,27 +702,6 @@ function handlePaymentSubmit(event) {
   if (!selectedAccount) {
     setPaymentMessage("Debes seleccionar un usuario predefinido.", "error");
     return;
-  }
-
-  if (method === "card") {
-    const cardNumber = document.getElementById("cardNumber").value.trim();
-    const cardExpiry = document.getElementById("cardExpiry").value.trim();
-    const cardCvv = document.getElementById("cardCvv").value.trim();
-
-    if (!isValidCardNumber(cardNumber)) {
-      setPaymentMessage("Numero de tarjeta invalido.", "error");
-      return;
-    }
-
-    if (!isValidExpiry(cardExpiry)) {
-      setPaymentMessage("Fecha de vencimiento invalida. Usa MM/AA.", "error");
-      return;
-    }
-
-    if (!isValidCvv(cardCvv)) {
-      setPaymentMessage("CVV invalido.", "error");
-      return;
-    }
   }
 
   // Genera y guarda factura de la compra validada.
@@ -712,7 +719,6 @@ function handlePaymentSubmit(event) {
 
   dom.paymentForm.reset();
   dom.paymentMethod.value = "card";
-  toggleCardFields();
   updateAccountInfo();
 
   setPaymentMessage(
@@ -724,6 +730,39 @@ function handlePaymentSubmit(event) {
 // ======================================================
 // PDF: formato de factura mas formal
 // ======================================================
+function drawInvoiceLogo(doc) {
+  // Paleta principal.
+  doc.setFillColor(255, 236, 200);
+  doc.setDrawColor(255, 221, 174);
+  doc.circle(178, 15, 7, "FD");
+
+  // Hueco de la paleta.
+  doc.setFillColor(23, 42, 70);
+  doc.circle(181, 17, 1.1, "F");
+
+  // Manchas de color en la paleta.
+  doc.setFillColor(255, 115, 130);
+  doc.circle(175.5, 12.4, 0.9, "F");
+  doc.setFillColor(88, 203, 255);
+  doc.circle(178.8, 11.5, 0.9, "F");
+  doc.setFillColor(103, 236, 190);
+  doc.circle(181.2, 13.4, 0.9, "F");
+  doc.setFillColor(255, 192, 92);
+  doc.circle(175.9, 16.5, 0.9, "F");
+
+  // Dos pinceles cruzados.
+  doc.setDrawColor(255, 247, 225);
+  doc.setLineWidth(1.3);
+  doc.line(188.6, 9.8, 198, 20.2);
+  doc.line(187.4, 20.2, 197.6, 10.4);
+
+  // Cerdas de los pinceles.
+  doc.setDrawColor(239, 167, 80);
+  doc.line(198, 20.2, 200.1, 22.5);
+  doc.setDrawColor(120, 198, 255);
+  doc.line(197.6, 10.4, 199.9, 8.1);
+}
+
 function drawInvoiceHeader(doc, receipt) {
   // Banda superior de titulo.
   doc.setFillColor(23, 42, 70);
@@ -736,6 +775,7 @@ function drawInvoiceHeader(doc, receipt) {
 
   doc.setFontSize(11);
   doc.text(companyInfo.name, 14, 22);
+  drawInvoiceLogo(doc);
 
   doc.setTextColor(20, 30, 45);
   doc.setFont("helvetica", "normal");
@@ -754,7 +794,7 @@ function drawInvoiceHeader(doc, receipt) {
 
 function drawClientBox(doc, receipt) {
   doc.setDrawColor(170, 184, 205);
-  doc.roundedRect(14, 62, 182, 20, 2, 2);
+  doc.roundedRect(14, 62, 182, 30, 2, 2);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
   doc.text("Datos del cliente", 16, 69);
@@ -762,10 +802,17 @@ function drawClientBox(doc, receipt) {
   doc.setFont("helvetica", "normal");
   doc.text(`Nombre: ${receipt.buyerName}`, 16, 75);
   doc.text(`Usuario: ${receipt.buyerUser}`, 110, 75);
+  const deliveryLabel = receipt.extras && receipt.extras.delivery === "express" ? "Express" : "Normal";
+  const extrasLabel = `Entrega: ${deliveryLabel} | Regalo: ${receipt.extras && receipt.extras.giftWrap ? "Si" : "No"} | Soporte: ${receipt.extras && receipt.extras.prioritySupport ? "Si" : "No"}`;
+  doc.text(extrasLabel, 16, 83);
+  if (receipt.extras && receipt.extras.note) {
+    const shortNote = receipt.extras.note.slice(0, 58);
+    doc.text(`Nota: ${shortNote}`, 16, 89);
+  }
 }
 
 function drawItemsTable(doc, receipt) {
-  let y = 90;
+  let y = receipt.extras && receipt.extras.note ? 100 : 94;
 
   // Encabezado de tabla.
   doc.setFillColor(236, 244, 255);
@@ -810,10 +857,10 @@ function drawItemsTable(doc, receipt) {
 }
 
 function drawInvoiceTotals(doc, y, receipt) {
-  const boxY = Math.min(y + 4, 252);
+  const boxY = Math.min(y + 4, 240);
 
   doc.setDrawColor(170, 184, 205);
-  doc.roundedRect(120, boxY, 76, 30, 2, 2);
+  doc.roundedRect(120, boxY, 76, 38, 2, 2);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
@@ -833,18 +880,26 @@ function drawInvoiceTotals(doc, y, receipt) {
     { align: "right" }
   );
 
+  doc.text("Extras:", 124, boxY + 22);
+  doc.text(
+    formatMoneyByCurrency(receipt.extrasGtq || 0, receipt.currency, receipt.exchangeRate),
+    194,
+    boxY + 22,
+    { align: "right" }
+  );
+
   doc.setFont("helvetica", "bold");
-  doc.text("Total:", 124, boxY + 24);
+  doc.text("Total:", 124, boxY + 31);
   doc.text(
     formatMoneyByCurrency(receipt.totalGtq, receipt.currency, receipt.exchangeRate),
     194,
-    boxY + 24,
+    boxY + 31,
     { align: "right" }
   );
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  doc.text(`Tipo de cambio: 1 USD = GTQ ${receipt.exchangeRate.toFixed(2)}`, 14, boxY + 28);
+  doc.text(`Tipo de cambio: 1 USD = GTQ ${receipt.exchangeRate.toFixed(2)}`, 14, boxY + 34);
 }
 
 function generatePdfReceipt() {
@@ -959,7 +1014,6 @@ function init() {
   dom.volumeRange.value = String(state.volume);
 
   applyTheme();
-  toggleCardFields();
   updateAccountInfo();
   updateClock();
   setInterval(updateClock, 1000);
@@ -971,8 +1025,18 @@ function init() {
   dom.openPayBtn.addEventListener("click", openPaymentPanel);
   dom.themeToggle.addEventListener("click", toggleTheme);
   dom.paymentForm.addEventListener("submit", handlePaymentSubmit);
-  dom.paymentMethod.addEventListener("change", toggleCardFields);
   dom.buyerAccount.addEventListener("change", updateAccountInfo);
+  dom.buyerName.addEventListener("input", (event) => {
+    event.target.value = sanitizeName(event.target.value);
+  });
+
+  // Recalcula totales cuando cambian opciones extra.
+  [dom.deliveryOption, dom.giftWrapOption, dom.prioritySupportOption, dom.invoiceCopyOption, dom.orderNote]
+    .filter(Boolean)
+    .forEach((element) => {
+      element.addEventListener("input", renderCart);
+      element.addEventListener("change", renderCart);
+    });
 
   // Filtro en tiempo real del catalogo.
   dom.productSearch.addEventListener("input", (event) => {

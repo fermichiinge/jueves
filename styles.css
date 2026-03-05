@@ -2,20 +2,20 @@
    Variables: modo claro
    ============================== */
 :root {
-  --bg-1: #fff5ea;
-  --bg-2: #ffeef5;
-  --bg-3: #eaf8ff;
-  --surface: rgba(255, 255, 255, 0.84);
+  --bg-1: #dff6ff;
+  --bg-2: #d8f2ff;
+  --bg-3: #f7ecff;
+  --surface: rgba(255, 255, 255, 0.86);
   --surface-strong: #ffffff;
-  --text: #25334c;
-  --muted: #607191;
-  --accent: #ff7e7e;
-  --accent-2: #22b8a9;
-  --accent-3: #ffcc68;
+  --text: #18345a;
+  --muted: #4f6f95;
+  --accent: #4db6e2;
+  --accent-2: #3ecfb7;
+  --accent-3: #ffb7d1;
   --danger: #ff5f73;
   --ok: #168c63;
-  --ring: rgba(255, 126, 126, 0.35);
-  --line: rgba(84, 108, 136, 0.2);
+  --ring: rgba(77, 182, 226, 0.35);
+  --line: rgba(71, 113, 161, 0.2);
   --shadow: 0 20px 40px rgba(41, 62, 89, 0.16);
   --radius-xl: 22px;
   --radius-lg: 16px;
@@ -25,20 +25,20 @@
    Variables: modo oscuro
    ============================== */
 body.dark {
-  --bg-1: #121a26;
-  --bg-2: #15182b;
-  --bg-3: #0f2a30;
-  --surface: rgba(27, 37, 54, 0.86);
-  --surface-strong: #243248;
-  --text: #f6f8ff;
-  --muted: #c6d0e2;
-  --accent: #ffa170;
-  --accent-2: #39d7c1;
-  --accent-3: #ffd487;
+  --bg-1: #04182f;
+  --bg-2: #04233f;
+  --bg-3: #0a3556;
+  --surface: rgba(12, 37, 66, 0.84);
+  --surface-strong: #0f3d67;
+  --text: #eff7ff;
+  --muted: #b8d5ef;
+  --accent: #55c8ff;
+  --accent-2: #57e5cf;
+  --accent-3: #ffd19a;
   --danger: #ff8ea0;
   --ok: #62d7a4;
-  --ring: rgba(255, 161, 112, 0.45);
-  --line: rgba(178, 200, 226, 0.25);
+  --ring: rgba(85, 200, 255, 0.45);
+  --line: rgba(165, 205, 239, 0.25);
   --shadow: 0 24px 45px rgba(1, 8, 20, 0.5);
 }
 
@@ -57,9 +57,9 @@ body {
   color: var(--text);
   font-family: "Quicksand", sans-serif;
   overflow-x: hidden;
-  background: linear-gradient(130deg, var(--bg-1), var(--bg-2), var(--bg-3));
-  background-size: 220% 220%;
-  animation: bgShift 18s ease infinite;
+  background: linear-gradient(170deg, var(--bg-1), var(--bg-2), var(--bg-3));
+  background-size: 260% 260%;
+  animation: bgShift 20s ease infinite;
 }
 
 /* Capa con degradado difuso para enriquecer el fondo */
@@ -68,10 +68,10 @@ body {
   inset: 0;
   z-index: -3;
   background:
-    radial-gradient(circle at 20% 20%, rgba(255, 142, 124, 0.35), transparent 45%),
-    radial-gradient(circle at 76% 28%, rgba(255, 212, 134, 0.35), transparent 40%),
-    radial-gradient(circle at 58% 75%, rgba(74, 220, 210, 0.35), transparent 45%);
-  animation: meshPulse 11s ease-in-out infinite;
+    radial-gradient(circle at 16% 12%, rgba(109, 220, 255, 0.36), transparent 44%),
+    radial-gradient(circle at 84% 25%, rgba(166, 248, 230, 0.3), transparent 42%),
+    radial-gradient(circle at 60% 80%, rgba(255, 204, 233, 0.3), transparent 42%);
+  animation: meshPulse 13s ease-in-out infinite;
 }
 
 /* Capa tipo grano suave para evitar fondo plano */
@@ -80,7 +80,7 @@ body {
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  opacity: 0.12;
+  opacity: 0.1;
   background-image:
     linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.45) 25%, transparent 26%),
     linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, 0.45) 25%, transparent 26%);
@@ -102,7 +102,7 @@ body {
   height: 360px;
   top: -100px;
   left: -100px;
-  background: radial-gradient(circle at 30% 30%, #ffdac5, #ffb996);
+  background: radial-gradient(circle at 30% 30%, #b8f0ff, #88d4ff);
 }
 
 .orb-2 {
@@ -110,7 +110,7 @@ body {
   height: 300px;
   right: -80px;
   top: 200px;
-  background: radial-gradient(circle at 30% 30%, #c2f4ff, #8de0ff);
+  background: radial-gradient(circle at 30% 30%, #d6ffe9, #98f2d0);
   animation-delay: 2s;
 }
 
@@ -119,9 +119,73 @@ body {
   height: 340px;
   bottom: -120px;
   left: 24%;
-  background: radial-gradient(circle at 30% 30%, #ffe9b4, #ffcf75);
+  background: radial-gradient(circle at 30% 30%, #ffdff1, #ffbbd7);
   animation-delay: 4s;
 }
+
+/* Decoracion marina: ballenas, medusas y burbujas animadas */
+.ocean-creatures {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.creature {
+  position: absolute;
+  filter: drop-shadow(0 6px 10px rgba(0, 58, 95, 0.22));
+}
+
+.whale {
+  font-size: clamp(2rem, 2.8vw, 3.2rem);
+  opacity: 0.32;
+}
+
+.whale-a {
+  left: -10%;
+  top: 16%;
+  animation: whaleSwimA 20s linear infinite;
+}
+
+.whale-b {
+  right: -12%;
+  top: 62%;
+  transform: scaleX(-1);
+  animation: whaleSwimB 24s linear infinite;
+}
+
+.jelly {
+  font-size: clamp(1.6rem, 2.1vw, 2.4rem);
+  opacity: 0.38;
+}
+
+.jelly-a {
+  left: 12%;
+  bottom: -8%;
+  animation: jellyRise 16s ease-in-out infinite;
+}
+
+.jelly-b {
+  right: 18%;
+  bottom: -10%;
+  animation: jellyRise 19s ease-in-out infinite 2.5s;
+}
+
+.bubble {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(210, 248, 255, 0.34);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.bubble-a { left: 24%; bottom: -12%; animation: bubbleRise 12s linear infinite; }
+.bubble-b { left: 50%; bottom: -16%; animation: bubbleRise 10s linear infinite 1.5s; }
+.bubble-c { left: 76%; bottom: -13%; animation: bubbleRise 11s linear infinite 0.8s; }
+.bubble-d { left: 90%; bottom: -18%; animation: bubbleRise 14s linear infinite 2.8s; }
 
 /* Carrito flotante que aparece cuando se abre el pago */
 .cart-fly {
@@ -159,6 +223,7 @@ body {
   backdrop-filter: blur(12px);
   border: 1px solid var(--line);
   padding: 20px;
+  animation: riseIn 0.7s ease both;
 }
 
 .eyebrow {
@@ -355,6 +420,7 @@ body.dark .register-volume {
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
   border: 1px solid var(--line);
+  animation: riseIn 0.7s ease both;
 }
 
 .product-panel {
@@ -405,6 +471,7 @@ body.dark .register-volume {
   display: flex;
   flex-direction: column;
   transition: transform 0.24s ease, box-shadow 0.24s ease;
+  animation: cardBreath 6s ease-in-out infinite;
 }
 
 .product:hover {
@@ -580,6 +647,13 @@ label {
   font-weight: 700;
 }
 
+.tiny-help {
+  margin: -4px 0 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
 input,
 select {
   border-radius: 10px;
@@ -591,13 +665,26 @@ select {
   font-size: 0.94rem;
 }
 
+textarea {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: #1f2f44;
+  padding: 9px 10px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  resize: vertical;
+}
+
 body.dark input,
-body.dark select {
+body.dark select,
+body.dark textarea {
   background: #eff6ff;
 }
 
 input:focus,
 select:focus,
+textarea:focus,
 button:focus {
   outline: none;
   border-color: transparent;
@@ -613,6 +700,40 @@ button:focus {
   border: 1px dashed var(--line);
   background: rgba(98, 130, 160, 0.1);
   padding: 8px;
+}
+
+.extra-options {
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: rgba(145, 220, 245, 0.13);
+  padding: 6px 8px;
+}
+
+body.dark .extra-options {
+  background: rgba(81, 160, 220, 0.14);
+}
+
+.extra-options summary {
+  font-size: 0.95rem;
+}
+
+.extra-options-grid {
+  margin-top: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.check-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.check-option input {
+  width: 16px;
+  height: 16px;
 }
 
 .card-fields {
@@ -822,6 +943,42 @@ button:focus {
   50% {
     opacity: 0.45;
   }
+}
+
+@keyframes whaleSwimA {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(60vw) translateY(16px); }
+  100% { transform: translateX(120vw) translateY(0); }
+}
+
+@keyframes whaleSwimB {
+  0% { transform: translateX(0) translateY(0) scaleX(-1); }
+  50% { transform: translateX(-55vw) translateY(-16px) scaleX(-1); }
+  100% { transform: translateX(-120vw) translateY(0) scaleX(-1); }
+}
+
+@keyframes jellyRise {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  20% { opacity: 0.45; }
+  75% { transform: translateY(-70vh) translateX(16px); opacity: 0.45; }
+  100% { transform: translateY(-95vh) translateX(-8px); opacity: 0; }
+}
+
+@keyframes bubbleRise {
+  0% { transform: translateY(0) scale(0.8); opacity: 0; }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.45; }
+  100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardBreath {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 
 /* ==============================
